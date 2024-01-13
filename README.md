@@ -1,3 +1,67 @@
+# DISTWAR atomic reduction optimization on 3D Gaussian Splatting
+
+| [DISTWAR full paper](https://arxiv.org/abs/2401.05345) |
+
+## Introduction
+
+This is a repository forked from the original "3D Gaussian Splatting for Real-Time Rendering of Radiance Fields" repository ([original project page](https://github.com/graphdeco-inria/gaussian-splatting)). Its rasterization engine has been modified to apply the serialized and butterfly atomic reduction optimizations proposed in our paper DISTWAR. On our experiment platform with Intel i9-13900KF and NVIDIA RTX 4090, we are able to achieve a speedup of ~2.0x at 7000 training iterations on DB COLMAP Playroom dataset compare to the baseline with no quality loss.
+
+The modified backward kernels with DISTWAR optimizations are implemented in the modified [diff-gaussian-rasterization](https://github.com/Accelsnow/diff-gaussian-rasterization-distwar) submodule. 
+
+## Setup
+
+We updated the setup environment to CUDA 12.1, Python 3.11.6, PyTorch 2.1.1, torchaudio 2.1.1 and torchvision 0.16.1 for CUDA sm89 support. We modified `environment.yml` and submodule repository links accordingly. You can follow the instructions from the original 3DGS repository to setup the environment (there is a copy of the original README below). 
+
+## How to enable different DISTWAR optimization modes
+
+No optimization is enabled by default. To enable DISTWAR atomic reduction optimizations, set the environment variable `BW_IMPLEMENTATION` accordingly:
+
+| `BW_IMPLEMENTATION`  | mode  |
+|---|---|
+| 0  | Original 3DGS implementation (DISTWAR disabled, no optimization) (_default_)  |
+| 1  | DISTWAR SW-B butterfly atomic reduction  |
+| 2  | DISTWAR SW-S serialized atomic reduction  |
+
+
+Additionally, set the environment variable `BALANCE_THRESHOLD` to set different _balance thresholds_ (reference Section IV-B of our paper for detailed explanations).
+On our experiment platform, a balance threshold of 8 with SW-B achieves the best performance across all datasets.
+
+The DISTWAR configuration will be printed to standard output at the first training iteration. You can reference it to confirm the current mode and the set balance threshold. An example to run the 3DGS optimizer with DISTWAR SW-B and a balance threshold of 8 on Linux:
+
+```
+export BW_IMPLEMENTATION=1
+export BALANCE_THRESHOLD=8
+python train.py -s <path to dataset> --eval
+```
+
+The 3DGS Python frontend is unmodified. You can reference the original README below to run with different configurations.
+
+------
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX for 3DGS</h2>
+    <pre><code>@Article{kerbl3Dgaussians,
+      author       = {Kerbl, Bernhard and Kopanas, Georgios and Leimk{\"u}hler, Thomas and Drettakis, George},
+      title        = {3D Gaussian Splatting for Real-Time Radiance Field Rendering},
+      journal      = {ACM Transactions on Graphics},
+      number       = {4},
+      volume       = {42},
+      month        = {July},
+      year         = {2023},
+      url          = {https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/}
+}</code></pre>
+  </div>
+</section>
+
+<br/>
+
+# Below this line is the original README.md from the [3DGS repository](https://github.com/graphdeco-inria/gaussian-splatting)
+
+<br/>
+
+------
+
 # 3D Gaussian Splatting for Real-Time Radiance Field Rendering
 Bernhard Kerbl*, Georgios Kopanas*, Thomas Leimkühler, George Drettakis (* indicates equal contribution)<br>
 | [Webpage](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) | [Full Paper](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/3d_gaussian_splatting_high.pdf) | [Video](https://youtu.be/T_kXY43VZnk) | [Other GRAPHDECO Publications](http://www-sop.inria.fr/reves/publis/gdindex.php) | [FUNGRAPH project page](https://fungraph.inria.fr) |<br>

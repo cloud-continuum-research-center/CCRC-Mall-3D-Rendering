@@ -1,16 +1,17 @@
-name: gaussian_splatting
+name: 3dgs_distwar
 channels:
   - pytorch
+  - nvidia
   - conda-forge
   - defaults
 dependencies:
-  - cudatoolkit=11.6
+  - pytorch-cuda=12.1
   - plyfile=0.8.1
-  - python=3.7.13
+  - python=3.11.6
   - pip=22.3.1
-  - pytorch=1.12.1
-  - torchaudio=0.12.1
-  - torchvision=0.13.1
+  - pytorch=2.1.1
+  - torchaudio=2.1.1
+  - torchvision=0.16.1
   - tqdm
   - pip:
     - submodules/diff-gaussian-rasterization

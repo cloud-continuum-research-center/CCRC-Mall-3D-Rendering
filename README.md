@@ -14,7 +14,7 @@ We updated the setup environment to CUDA 12.1, Python 3.11.6, PyTorch 2.1.1, tor
 
 ## How to enable different DISTWAR optimization modes
 
-No optimization is enabled by default. To enable DISTWAR atomic reduction optimizations, set the environment variable `BW_IMPLEMENTATION` accordingly:
+No optimization is enabled by default. To enable DISTWAR atomic reduction optimizations, set the environment variable `BW_IMPLEMENTATION` at runtime accordingly:
 
 | `BW_IMPLEMENTATION`  | mode  |
 |---|---|
@@ -23,10 +23,10 @@ No optimization is enabled by default. To enable DISTWAR atomic reduction optimi
 | 2  | DISTWAR SW-S serialized atomic reduction  |
 
 
-Additionally, set the environment variable `BALANCE_THRESHOLD` to set different _balance thresholds_ (reference Section IV-B of our paper for detailed explanations).
-On our experiment platform, a balance threshold of 8 with SW-B achieves the best performance across all datasets.
+Additionally, set the environment variable `BALANCE_THRESHOLD` at runtime to set different _balance thresholds_ (reference Section IV-B of our paper for detailed explanations).
+By default, the balance threshold is set to 8, which achieves the best performance with SW-B enabled across most datasets on our experiment platform. When the `BW_IMPLEMENTATION` is set to 0 for original 3DGS, `BALANCE_THRESHOLD` has no effect.
 
-The DISTWAR configuration will be printed to standard output at the first training iteration. You can reference it to confirm the current mode and the set balance threshold. An example to run the 3DGS optimizer with DISTWAR SW-B and a balance threshold of 8 on Linux:
+The DISTWAR configuration will be printed to standard output at the first training iteration. You can reference it to confirm the current mode and the set balance threshold. An example to run the 3DGS optimizer with DISTWAR SW-B and a balance threshold of 8 on Linux (note that the environment variables are set immediately before starting the training process):
 
 ```
 export BW_IMPLEMENTATION=1

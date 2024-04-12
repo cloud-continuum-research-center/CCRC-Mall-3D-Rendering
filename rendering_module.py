@@ -1,6 +1,7 @@
 import os
 import logging
 import shutil
+import subprocess
 
 def sfm_runner(video_uuid: str):
     source_path = "data/"+video_uuid
@@ -66,6 +67,20 @@ def sfm_runner(video_uuid: str):
         shutil.move(source_file, destination_file)
     
     print("Done.")
+    
+    
+    #training
+    os.environ["BW_IMPLEMENTATION"] = "1"
+    os.environ["BALANCE_THRESHOLD"] = "8"
+    os.environ["OAR_JOB_ID"] = video_uuid
+    
+    subprocess.Popen(['sh','run_train.sh'])
+    
+    # exit_code = os.system("OAR_JOB_ID="+video_uuid+" python -s data/"+video_uuid)
+    # if exit_code != 0:
+    #     logging.error(f"Mapper failed with code {exit_code}. Exiting.")
+    #     exit(exit_code)
+    
     
     
 if __name__ == "__main__":

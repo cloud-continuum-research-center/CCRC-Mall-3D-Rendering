@@ -44,7 +44,7 @@ def download_file(file_name,bucket, object_name=None):
     os.system("ffmpeg -i data/"+object_name+"/"+object_name+".mp4 -qscale:v 1 -qmin 1 -vf fps=2 "
               +"data/"+object_name+"/input/%04d.jpg")
     
-    return True
+    return object_name
 
-
-download_file("dkqcnrss", "3d-modeling-mall", "dkqcnrss")
+if __name__ == "__main__":
+    download_file("dkqcnrss", "3d-modeling-mall", "dkqcnrss")

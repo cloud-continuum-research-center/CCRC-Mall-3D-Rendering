@@ -1,4 +1,4 @@
-name: 3dgs_distwar
+name: distwar_colmap
 channels:
   - pytorch
   - nvidia

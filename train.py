@@ -22,6 +22,12 @@ from tqdm import tqdm
 from utils.image_utils import psnr
 from argparse import ArgumentParser, Namespace
 from arguments import ModelParams, PipelineParams, OptimizationParams
+
+import requests
+import json
+import aws_module
+import secret
+
 try:
     from torch.utils.tensorboard import SummaryWriter
     TENSORBOARD_FOUND = True
@@ -138,7 +144,7 @@ def prepare_output_and_logger(args):
             unique_str=os.getenv('OAR_JOB_ID')
         else:
             unique_str = str(uuid.uuid4())
-        args.model_path = os.path.join("./output/", unique_str[0:10])
+        args.model_path = os.path.join("./output/", unique_str)
         
     # Set up output folder
     print("Output folder: {}".format(args.model_path))
@@ -190,6 +196,8 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
             tb_writer.add_histogram("scene/opacity_histogram", scene.gaussians.get_opacity, iteration)
             tb_writer.add_scalar('total_points', scene.gaussians.get_xyz.shape[0], iteration)
         torch.cuda.empty_cache()
+        
+
 
 if __name__ == "__main__":
     # Set up command line argument parser
@@ -221,3 +229,19 @@ if __name__ == "__main__":
 
     # All done
     print("\nTraining complete.")
+    
+    if os.getenv('OAR_JOB_ID'):
+        video_uuid=os.getenv('OAR_JOB_ID')
+    
+    aws_module.upload_file(video_uuid,"3d-modeling-mall", video_uuid)
+    
+    item_id = os.getenv('ITEM_ID')
+    
+    data = {
+        'item_id' : int(item_id),
+        'splat_uuid' : video_uuid
+    }
+    
+    response = requests.put('http://'+ secret.BACK_IP+'/api/receive', params=data)
+    
+    

@@ -3,7 +3,7 @@ import logging
 import shutil
 import subprocess
 
-def sfm_runner(video_uuid: str):
+def sfm_runner(video_uuid: str, item_id : int):
     source_path = "data/"+video_uuid
     use_gpu = 1
     camera = "OPENCV"
@@ -73,6 +73,7 @@ def sfm_runner(video_uuid: str):
     os.environ["BW_IMPLEMENTATION"] = "1"
     os.environ["BALANCE_THRESHOLD"] = "8"
     os.environ["OAR_JOB_ID"] = video_uuid
+    os.environ["ITEM_ID"] = str(item_id)
     
     subprocess.Popen(['sh','run_train.sh'])
     

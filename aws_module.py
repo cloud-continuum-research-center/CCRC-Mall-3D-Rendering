@@ -14,8 +14,8 @@ def upload_file(file_name, bucket, object_name=None):
     aws_access_key_id=secret.AWS_ACCESS_KEY_ID, aws_secret_access_key=secret.AWS_SECRET_ACCESS_KEY)
     
     try:
-        with open("output/73c5573e-7/point_cloud/iteration_7000/" + file_name, "rb") as f:
-            response = s3_client.upload_fileobj(f, bucket, object_name)
+        with open("output/"+object_name+"/point_cloud/iteration_7000/point_cloud.ply" , "rb") as f:
+            response = s3_client.upload_fileobj(f, bucket, object_name+".ply")
     except ClientError as e:
         logging.error(e)
         return False

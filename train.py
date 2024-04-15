@@ -36,6 +36,8 @@ except ImportError:
 
 def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoint_iterations, checkpoint, debug_from):
     
+    
+    
     first_iter = 0
     tb_writer = prepare_output_and_logger(dataset)
     gaussians = GaussianModel(dataset.sh_degree)
@@ -107,8 +109,22 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             if iteration % 10 == 0:
                 progress_bar.set_postfix({"Loss": f"{ema_loss_for_log:.{7}f}"})
                 progress_bar.update(10)
+                elapsed = progress_bar.format_dict["elapsed"]
+                rate = progress_bar.format_dict["rate"]
+                remaining = (progress_bar.total - progress_bar.n) / rate if rate and progress_bar.total else 0
+                
+                log_data = dict()
+                log_data["progress"] = int(progress_bar.n/opt.iterations*100)
+                log_data["elapsed_time"] = elapsed
+                log_data["remain_time"] = remaining
+                
+                with open("progress_log/"+"test"+"_progress.json", "w") as log:
+                    json.dump(log_data, log, indent="\t")
+                
             if iteration == opt.iterations:
+                
                 progress_bar.close()
+                
 
             # Log and save
             training_report(tb_writer, iteration, Ll1, loss, l1_loss, iter_start.elapsed_time(iter_end), testing_iterations, scene, render, (pipe, background))
@@ -243,5 +259,14 @@ if __name__ == "__main__":
     }
     
     response = requests.put('http://'+ secret.BACK_IP+'/api/receive', params=data)
+    
+    #log_init
+    log_data = dict()
+    log_data["progress"] = 0
+    log_data["elapsed_time"] = 0
+    log_data["remain_time"] = 0
+    
+    with open("progress_log/"+"test"+"_progress.json", "w") as log:
+        json.dump(log_data, log, indent="\t")
     
     

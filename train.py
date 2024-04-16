@@ -225,8 +225,8 @@ if __name__ == "__main__":
     parser.add_argument('--port', type=int, default=6009)
     parser.add_argument('--debug_from', type=int, default=-1)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
-    parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000])
-    parser.add_argument("--save_iterations", nargs="+", type=int, default=[7_000])
+    parser.add_argument("--test_iterations", nargs="+", type=int, default=[secret.ITERATION])
+    parser.add_argument("--save_iterations", nargs="+", type=int, default=[secret.ITERATION])
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[])
     parser.add_argument("--start_checkpoint", type=str, default = None)
@@ -234,6 +234,14 @@ if __name__ == "__main__":
     args.save_iterations.append(args.iterations)
     
     print("Optimizing " + args.model_path)
+    #log_init
+    log_data = dict()
+    log_data["progress"] = 0
+    log_data["elapsed_time"] = 0
+    log_data["remain_time"] = 0
+    
+    with open("progress_log/"+"test"+"_progress.json", "w") as log:
+        json.dump(log_data, log, indent="\t")
 
     # Initialize system state (RNG)
     safe_state(args.quiet)
@@ -260,13 +268,10 @@ if __name__ == "__main__":
     
     response = requests.put('http://'+ secret.BACK_IP+'/api/receive', params=data)
     
-    #log_init
-    log_data = dict()
-    log_data["progress"] = 0
-    log_data["elapsed_time"] = 0
-    log_data["remain_time"] = 0
     
-    with open("progress_log/"+"test"+"_progress.json", "w") as log:
-        json.dump(log_data, log, indent="\t")
+    # remove output for saving storage
+    os.system("rm -rf data/"+ video_uuid+"/")
+    os.system("rm -rf output/"+ video_uuid+"/")
+    
     
     
